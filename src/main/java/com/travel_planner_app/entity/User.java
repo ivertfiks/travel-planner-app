@@ -17,6 +17,7 @@ import java.util.Collection;
 @AllArgsConstructor
 @Entity(name = "registered_users")
 public class User  {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;

@@ -1,0 +1,24 @@
+1. Create AuthenticationFilter class
+    - Extend this class from UsernamePasswordAuthenticationFilter
+    - Implement/Override method  public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
+
+    For the implementation:
+      - Read user from inputstream of request: User user = new ObjectMapper().readValue(request.getInputStream(), User.class);
+      -  Authentication authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
+      - (later step) call the manager's authenticate method: authenticationManager.authenticate(authentication);
+
+2. Create UsernamePasswordAuthenticationToken class
+    - Implement AuthenticationManager interface within CustomAuthenticationManager
+    - Implement authenticate() method
+3. Go back to AuthenticationFilter class and inject CustomAuthenticationManager and call the authenticate method
+4. In UsernamePasswordAuthenticationToken
+    - get the username by calling authentication.getName()
+    - get user from the database by calling getUser(authentication.getName())
+    - compare the user.getPassword and authentication.getCredentials().toString()
+    - throw BadCredentialsException or return new UsernamePasswordAuthenticationToken
+5. Implement successful/unsuccessful methods in the filter class
+6. In SecurityConfig, in addition to the basic block of the method, add the following:
+  -   Create the authenticationFilter object:
+            AuthentificationFilter authentificationFilter = new AuthentificationFilter(customAuthenticationManager);
+            authentificationFilter.setFilterProcessesUrl(SecurityConstants.LOGIN_PATH);
+  - addFilter under http
