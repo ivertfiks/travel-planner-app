@@ -7,8 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EventRepository extends CrudRepository<Event, Integer> {
-
-    @Autowired
     Event getEventByName(String name);
-
 }
