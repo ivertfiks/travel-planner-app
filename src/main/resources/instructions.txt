@@ -7,7 +7,7 @@
       -  Authentication authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
       - (later step) call the manager's authenticate method: authenticationManager.authenticate(authentication);
 
-2. Create UsernamePasswordAuthenticationToken class
+2. Create CustomAuthenticationManager class
     - Implement AuthenticationManager interface within CustomAuthenticationManager
     - Implement authenticate() method
 3. Go back to AuthenticationFilter class and inject CustomAuthenticationManager and call the authenticate method
@@ -22,3 +22,26 @@
             AuthentificationFilter authentificationFilter = new AuthentificationFilter(customAuthenticationManager);
             authentificationFilter.setFilterProcessesUrl(SecurityConstants.LOGIN_PATH);
   - addFilter under http
+
+7. Add RandomKeyGenerator class with a single method implementation:
+
+    public static String generateRandomKey() {
+        SecureRandom random = new SecureRandom();
+        byte[] key = new byte[64]; // 512 bits / 8 = 64 (1 byte = 8 bits)
+        random.nextBytes(key);
+        return Base64.getEncoder().encodeToString(key);
+    }
+
+8. For the successfulAuthentication method
+  - call JWT.create()
+  - call withSubject and pass username
+  - call withExpiresAt and pass current time + 2 hours in milliseconds
+  - call sign and sign with HMAC512 Algorithm
+  - save the result in a token String
+  - pass the string as header in the response: response.setHeader(SecurityConstants.AUTHORIZATION_HEADER, SecurityConstants.BEARER_PREFIX + token);
+
+9. For unsuccessfulAuthentication
+  - set status to 401 (SC_UNAUTHORIZED)
+  - call printwriters' write method
+  - call printwriter's flush method
+

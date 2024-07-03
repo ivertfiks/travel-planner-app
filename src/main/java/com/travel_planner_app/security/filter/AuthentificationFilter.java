@@ -1,12 +1,16 @@
 package com.travel_planner_app.security.filter;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.travel_planner_app.entity.User;
+import com.travel_planner_app.security.SecurityConstants;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -38,12 +42,22 @@ public class AuthentificationFilter extends UsernamePasswordAuthenticationFilter
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
         Authentication authResult) throws IOException, ServletException {
         log.info("Successful authentication");
+        String token = JWT.create()
+            .withSubject(authResult.getName())
+            .withExpiresAt(new Date(System.currentTimeMillis() + SecurityConstants.TOKEN_EXPIRATION))
+            .sign(Algorithm.HMAC512(SecurityConstants.SECRET_KEY));
+        log.info("SECRET KEY: " + SecurityConstants.SECRET_KEY);
+        log.info("TOKEN: " + token);
+        response.setHeader(SecurityConstants.AUTHORIZATION_HEADER, SecurityConstants.BEARER_PREFIX + token);
     }
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
         AuthenticationException failed) throws IOException, ServletException {
         log.info("Unsuccessful authentication");
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.getWriter().write(failed.getMessage());
+        response.getWriter().flush();
     }
 
 }
