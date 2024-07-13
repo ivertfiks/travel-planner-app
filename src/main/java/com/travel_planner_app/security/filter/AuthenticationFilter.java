@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @AllArgsConstructor
 @Slf4j
-public class AuthentificationFilter extends UsernamePasswordAuthenticationFilter {
+public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
 

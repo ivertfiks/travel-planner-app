@@ -3,6 +3,7 @@ package com.travel_planner_app.service.impl;
 import com.travel_planner_app.entity.User;
 import com.travel_planner_app.repository.UserRepository;
 import com.travel_planner_app.service.UserService;
+import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -31,6 +32,11 @@ public class UserServiceImpl implements UserService {
     public User getUser(String username) {
         Optional<User> user = userRepository.findByUsername(username);
         return unwrapUser(user);
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return (List<User>) userRepository.findAll();
     }
 
     private User unwrapUser(Optional<User> entity) {
